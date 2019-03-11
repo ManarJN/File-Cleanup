@@ -14,7 +14,7 @@
 import os, re, datetime, shutil, stat
 
 # removes read only attribute of files so folders can be deleted
-def onerrorHandler(func, path, exc_info):
+def onerror_handler(func, path):
     if not os.access(path, os.W_OK):
         os.chmod(path, stat.S_IWUSR)
         func(path)
@@ -24,7 +24,7 @@ def onerrorHandler(func, path, exc_info):
 regex = re.compile(r'^(\d{8})_([0-9 ]{6})$')  # pattern to read file names
 
 # renames files with 4-digit times to include a leading 0
-def backupRename(location):
+def backup_rename(location):
     for file in os.listdir(location):    
         # skips items that aren't folders with datetimes as their names
         if re.match(regex, file) is None:
@@ -38,11 +38,11 @@ def backupRename(location):
         # adds leading zero to remaining file names with 4-digit time     
         if tm_str.startswith(' ') is True:
             os.rename(os.path.join(location, file), os.path.join(location, dt_str + '_0' + tm_str[1:]))
-# end of backupRename        
+# end of backup_rename
         
         
 # deletes backups older than 4 days        
-def backupCleanup(location, remove):
+def backup_cleanup(location, remove):
     startdt = datetime.datetime.now()  # obtains current datetime
 
     for file in os.listdir(location):    
@@ -56,10 +56,10 @@ def backupCleanup(location, remove):
                 
         # deletes backups older than 4 days
         if (startdt - dt).days > remove:
-            shutil.rmtree(os.path.join(location, file), ignore_errors=False, onerror=onerrorHandler)
-# end of backupCleanup
+            shutil.rmtree(os.path.join(location, file), ignore_errors=False, onerror=onerror_handler)
+# end of backup_cleanup
 	
 	
 # run program 
-#backupRename('')
-#backupCleanup('', )
+#backup_rename('')
+#backup_cleanup('', )
